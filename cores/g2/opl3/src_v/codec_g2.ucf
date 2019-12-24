@@ -1,0 +1,8 @@
+# Wolfson codec audio interface
+NET "codec_bclk" LOC = AB13 | IOSTANDARD = LVCMOS33;
+NET "codec_adclrck" LOC = W9 | IOSTANDARD = LVCMOS33;
+NET "codec_adcdata" LOC = R13 | IOSTANDARD = LVCMOS33;
+NET "codec_daclrck" LOC = U6 | IOSTANDARD = LVCMOS33;
+NET "codec_dacdata" LOC = Y14 | IOSTANDARD = LVCMOS33;
+NET "codec_mclk" LOC = W14 | IOSTANDARD = LVCMOS33;
+
