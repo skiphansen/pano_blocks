@@ -164,7 +164,7 @@ update_ram:
 # Rule: Program Bitstream into SPI flash using XC2PROG
 ###############################################################################
 BSCAN_SPI_BITFILE = $(BSCAN_SPI_DIR)/$(PART_NAME).bit   
-prog_fpga: $(PLATFORM_BITFILE)
+prog_fpga:
 	$(XC3SPROG) $(XC3SPROG_OPTS) -I$(BSCAN_SPI_BITFILE) $(PLATFORM_BITFILE)
 
 
