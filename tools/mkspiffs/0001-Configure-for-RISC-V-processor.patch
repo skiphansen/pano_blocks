@@ -1,0 +1,25 @@
+From 7495f77c4529536ed268351e5c7960cfc5eaad3b Mon Sep 17 00:00:00 2001
+From: Skip Hansen <skip@gfrn.org>
+Date: Sat, 28 Dec 2019 08:14:00 -0800
+Subject: [PATCH] Configure for RISC-V processor.
+
+---
+ include/spiffs_config.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/spiffs_config.h b/include/spiffs_config.h
+index de988e5..7fbb99b 100755
+--- a/include/spiffs_config.h
++++ b/include/spiffs_config.h
+@@ -222,7 +222,7 @@ typedef uint8_t u8_t;
+ 
+ // Enable this if your target needs aligned data for index tables
+ #ifndef SPIFFS_ALIGNED_OBJECT_INDEX_TABLES
+-#define SPIFFS_ALIGNED_OBJECT_INDEX_TABLES      0
++#define SPIFFS_ALIGNED_OBJECT_INDEX_TABLES      1
+ #endif
+ 
+ // Enable this if you want the HAL callbacks to be called with the spiffs struct
+-- 
+2.17.1
+

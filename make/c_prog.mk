@@ -56,7 +56,8 @@ OBJDUMP      = $(GCC_PREFIX)objdump
 CP	     = cp   
 LN	     = ln
 DATA2MEM     = data2mem   
-CREATE_MIF   = $(TOOLS_DIR)/create_mif.rb   
+CREATE_MIF   := $(TOOLS_DIR)/create_mif.rb   
+MKSPIFFS     := $(TOOLS_DIR)/mkspiffs/mkspiffs
 
 ###############################################################################
 # Variables: Compilation flags
