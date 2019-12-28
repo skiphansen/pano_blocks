@@ -1,0 +1,5 @@
+build/
+mkspiffs/mkspiffs
+
+bin2c/bin2c
+bin2ram_init/bin2ram_init
