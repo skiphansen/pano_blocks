@@ -13,6 +13,9 @@ endif
 
 ifeq ($(V),)
    Q=@
+   TTY=/dev/null
+else
+   TTY=/dev/stdout
 endif
 
 # directory related

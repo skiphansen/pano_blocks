@@ -164,6 +164,8 @@ prog_fpga:
 update_ram:
 	$(Q)make -C $(PANO_RTL_DIR) update_ram
 
+$(MKSPIFFS):
+	(make -C $(TOOLS_DIR)/mkspiffs) > $(TTY)
 
 ###############################################################################
 # Rules: Dependancies
