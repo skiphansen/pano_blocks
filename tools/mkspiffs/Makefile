@@ -8,8 +8,8 @@ build/mkspiffs:
 	cp build/mkspiffs .
 
 clean:
-	rm -rf build
-	rm mkspiffs
+	-rm -rf build
+	-rm mkspiffs
 
 
 

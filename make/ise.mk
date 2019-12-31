@@ -7,6 +7,7 @@ XILINX_ISE ?= /opt/Xilinx/14.7/ISE_DS/ISE/bin/lin64
 EXTRA_VFLAGS ?= 
 PROJECT_DIR  ?= build
 PROJECT      ?= fpga
+TOP_MODULE   ?= top
 
 ###############################################################################
 # Checks
@@ -65,7 +66,14 @@ $(PROJECT_DIR)/$(PROJECT).ut: | $(PROJECT_DIR)
 $(PROJECT_DIR)/$(PROJECT).xst: | $(PROJECT_DIR)
 	if [ -e $(PROJECT).xst ]; then cp $(PROJECT).xst $(PROJECT_DIR); else \
 	cp $(MAKE_DIR)/default.xst $(PROJECT_DIR)/$(PROJECT).xst; fi
+	echo "-ifn $(PROJECT).prj" >> $@
+	echo "-ofn $(PROJECT)" >> $@
 	echo "-p $(PART_NAME)-$(PART_SPEED)-$(PART_PACKAGE)" >> $@
+	echo "-top $(TOP_MODULE)" >> $@
+ifneq ($(EXTRA_VFLAGS),-g2-c)
+	echo "-define {$(EXTRA_VFLAGS)}" >> $@
+endif
+
 
 ###############################################################################
 # PROJECT.prj
@@ -77,7 +85,7 @@ $(PROJECT_DIR)/$(PROJECT).prj: $(PROJECT_DIR)/$(PROJECT).ut $(PROJECT_DIR)/$(PRO
 # PROJECT.ucf
 ###############################################################################
 UCF_FILE  = $(PROJECT_DIR)/$(PROJECT).ucf
-UCF_FILES := $(foreach _dir,$(SRC_DIR), $(wildcard $(_dir)/*_$(PANO_SERIES).ucf))
+UCF_FILES += $(foreach _dir,$(SRC_DIR), $(wildcard $(_dir)/*_$(PANO_SERIES).ucf))
 $(UCF_FILE): $(UCF_FILES)
 	cat $^ > $@
 
@@ -163,7 +171,7 @@ update_ram:
 ###############################################################################
 # Rule: Program Bitstream into SPI flash using XC2PROG
 ###############################################################################
-BSCAN_SPI_BITFILE = $(BSCAN_SPI_DIR)/$(PART_NAME).bit   
+BSCAN_SPI_BITFILE = $(BSCAN_SPI_DIR)/$(PART_NAME).bit
 prog_fpga:
 	$(XC3SPROG) $(XC3SPROG_OPTS) -I$(BSCAN_SPI_BITFILE) $(PLATFORM_BITFILE)
 

@@ -7,6 +7,7 @@
 void LogHex(int LogFlags,void *Data,int Len)
 {
    int i;
+   int SentNl;
    uint8_t *cp = (uint8_t *) Data;
 
    for(i = 0; i < Len; i++) {
@@ -18,7 +19,7 @@ void LogHex(int LogFlags,void *Data,int Len)
       }
       _LOG(LogFlags,"%02x",cp[i]);
    }
-   if(((i - 1) & 0xf) != 0) {
+   if(i == 1 || ((i - 1) & 0xf) != 0) {
       _LOG(LogFlags,"\n");
    }
 }

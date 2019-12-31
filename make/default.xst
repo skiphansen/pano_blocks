@@ -1,11 +1,8 @@
 set -tmpdir "xst/projnav.tmp"
 set -xsthdpdir "xst"
 run
--ifn fpga.prj
 -ifmt mixed
--ofn fpga
 -ofmt NGC
--top top
 -opt_mode Speed
 -opt_level 2
 -iuc NO

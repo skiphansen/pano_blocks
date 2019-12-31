@@ -56,8 +56,6 @@ OBJDUMP      = $(GCC_PREFIX)objdump
 CP	     = cp   
 LN	     = ln
 DATA2MEM     = data2mem   
-CREATE_MIF   := $(TOOLS_DIR)/create_mif.rb   
-MKSPIFFS     := $(TOOLS_DIR)/mkspiffs/mkspiffs
 
 ###############################################################################
 # Variables: Compilation flags
@@ -158,14 +156,8 @@ clean:
 load:
 	$(Q)make -C $(PANO_RTL_DIR) load
 
-prog_fpga:
-	$(Q)make -C $(PANO_RTL_DIR) prog_fpga
-
 update_ram:
 	$(Q)make -C $(PANO_RTL_DIR) update_ram
-
-$(MKSPIFFS):
-	(make -C $(TOOLS_DIR)/mkspiffs) > $(TTY)
 
 ###############################################################################
 # Rules: Dependancies
@@ -174,4 +166,6 @@ EXCLUDE_DEPS := clean
 ifeq (0, $(words $(findstring $(MAKECMDGOALS), $(EXCLUDE_DEPS))))
 -include $(DEPS)
 endif
+
+include $(MAKE_DIR)/tools.mk
 

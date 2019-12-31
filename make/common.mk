@@ -29,6 +29,7 @@ CPU_CORE_DIR := $(CORES_DIR)/cpu/riscv
 PREBUILT_DIR := $(TOPDIR)/prebuilt
 PANO_RTL_DIR := $(TOPDIR)/fpga
 RTL_INIT_MEM := $(PANO_RTL_DIR)/firmware.mem
+BSCAN_SPI_DIR := $(PANO_CORES_DIR)/xc3sprog
 
 # xc3sprog related
 CABLE 	      ?= jtaghs2
@@ -39,5 +40,4 @@ XC3SPROG      ?= xc3sprog
 TARGET_BAUD ?= 1000000
 TARGET_PORT ?= /dev/ttyUSB1
 RUN_PREFIX  := $(TOOLS_DIR)/dbg_bridge/run.py -d $(TARGET_PORT) -b $(TARGET_BAUD) -f 
-
 
