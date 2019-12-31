@@ -36,7 +36,11 @@ short int audio_registers[][2] = {
     // MCLK 12 MHz, around a 96kHz sample rate
     { WM8750_SAMPLE_RATE_ADDR,          (0<<7) |    // BCM    : Bit Clock Mode disabled
                                         (0<<6) |    // CLKDIV2: MCLK is not divided by 2
+#if 0                                                    //
                                       (0xe<<1) |    // SR     : ADC and DAC 96kHz
+#else
+                                        (0x1c<<1) |    // SR     : ADC and DAC 48kHz
+#endif
                                         (1<<0) },   // USB    : USB clock mode 
     // Set left and right channel volume
     { WM8750_LCHAN_VOL_ADDR,            (0<<8) |    // LDVU   : No left DAC volume update

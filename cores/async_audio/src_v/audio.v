@@ -1,6 +1,6 @@
 // 96 Khz async audio output block
 
-// `define CHIP_SCOPE = 1
+`define CHIP_SCOPE = 1
 module audio(
     input wire  clk12,  // MCLK and BCLK
     input wire  reset12,
@@ -19,14 +19,12 @@ module audio(
     (* mark_debug = "TRUE" *) wire debug_codec_dacdat;
     (* mark_debug = "TRUE" *) wire debug_codec_daclrc;
     (* mark_debug = "TRUE" *) wire [15:0] debug_audio_right_sample;
-    (* mark_debug = "TRUE" *) wire debug_audio_sample_clk;
 
     assign debug_clk12 = clk12;
     assign debug_reset12 = reset12;
     assign debug_codec_dacdat = codec_dacdat;
     assign debug_codec_daclrc = codec_daclrc;
     assign debug_audio_right_sample = audio_right_sample;
-    assign debug_audio_sample_clk = audio_sample_clk;
 `endif
 
 // We'll use 96 Khz so our sample rate is MCLK / 125
