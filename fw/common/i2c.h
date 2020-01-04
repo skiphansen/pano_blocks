@@ -10,6 +10,10 @@ typedef struct {
    uint32_t GpioBase;
    uint32_t BitSCL;
    uint32_t BitSDA;
+// Slow I2C devices need 4.7 microseconds ... but the Pano doesn't have
+// Slow devices, but provide an optional delay for external I2C devices that
+// might be slow.
+   int I2CDelay;  // microseconds
 } ContextI2C;
 
 int i2c_init(ContextI2C *pCtx);

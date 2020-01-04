@@ -10,10 +10,6 @@
 #define REG_WR(reg, wr_data)       *((volatile uint32_t *)(reg)) = (wr_data)
 #define REG_RD(reg)                *((volatile uint32_t *)(reg))
 
-// Slow I2C devices need 4.7 microseconds ... but the Pano doesn't have
-// any slow devices, but be safe.
-#define I2C_DLY() timer_sleep_us(5)
-
 static void i2c_set_bit(ContextI2C *pCtx, int Value, int Bit)
 {
    uint32_t Temp = REG_RD(pCtx->GpioBase + GPIO_DIRECTION);
@@ -58,20 +54,32 @@ static int i2c_get_sda(ContextI2C *pCtx)
 int i2c_init(ContextI2C *pCtx)
 {
    int Ret = 0;   // assume the best
+   int i;
 
    i2c_set_sda(pCtx,1);
    i2c_set_scl(pCtx,1);
 // Precondition output data to zeros for SCL, SDA bits
    REG_WR(pCtx->GpioBase + GPIO_OUTPUT_CLR,pCtx->BitSCL);
    REG_WR(pCtx->GpioBase + GPIO_OUTPUT_CLR,pCtx->BitSDA);
-   I2C_DLY();
+   timer_sleep_us(pCtx->I2CDelay);
    if(i2c_get_scl(pCtx) != 1) {
       ELOG("Failed, SCL not high after init\n");
       Ret = 1;
    }
    if(i2c_get_sda(pCtx) != 1) {
-      ELOG("Failed, SDA not high after init\n");
-      Ret = 1;
+      LOG("SDA not high after init\n");
+   // Thump the clock a bunch to attempt to recover
+      for(i = 0; i < 32; i++) {
+         i2c_set_scl(pCtx,0);
+         i2c_set_scl(pCtx,1);
+      }
+      if(i2c_get_sda(pCtx) != 1) {
+         ELOG("Failed, SDA not high after init\n");
+         Ret = 1;
+      }
+      else {
+         LOG("SDA high after generating clocks\n");
+      }
    }
 
    return Ret;
@@ -80,23 +88,23 @@ int i2c_init(ContextI2C *pCtx)
 void i2c_start(ContextI2C *pCtx)
 {
    i2c_set_sda(pCtx,1);             // i2c start bit sequence
-   I2C_DLY();
+   timer_sleep_us(pCtx->I2CDelay);
    i2c_set_scl(pCtx,1);
-   I2C_DLY();
+   timer_sleep_us(pCtx->I2CDelay);
    i2c_set_sda(pCtx,0);
-   I2C_DLY();
+   timer_sleep_us(pCtx->I2CDelay);
    i2c_set_scl(pCtx,0);
-   I2C_DLY();
+   timer_sleep_us(pCtx->I2CDelay);
 }
 
 void i2c_stop(ContextI2C *pCtx)
 {
    i2c_set_sda(pCtx,0);             // i2c stop bit sequence
-   I2C_DLY();
+   timer_sleep_us(pCtx->I2CDelay);
    i2c_set_scl(pCtx,1);
-   I2C_DLY();
+   timer_sleep_us(pCtx->I2CDelay);
    i2c_set_sda(pCtx,1);
-   I2C_DLY();
+   timer_sleep_us(pCtx->I2CDelay);
 }
 
 unsigned char i2c_rx(ContextI2C *pCtx, char ack)
@@ -109,14 +117,14 @@ unsigned char i2c_rx(ContextI2C *pCtx, char ack)
       d <<= 1;
 
       i2c_set_scl(pCtx,1);
-      I2C_DLY();
+      timer_sleep_us(pCtx->I2CDelay);
 
       // wait for any i2c_set_scl clock stretching
       while(i2c_get_scl(pCtx) == 0);
 
       d |= i2c_get_sda(pCtx);
       i2c_set_scl(pCtx,0);
-      I2C_DLY();
+      timer_sleep_us(pCtx->I2CDelay);
    }
 
    if(ack) {
@@ -127,10 +135,10 @@ unsigned char i2c_rx(ContextI2C *pCtx, char ack)
    }
 
    i2c_set_scl(pCtx,1);
-   I2C_DLY();         // send (N)ACK bit
+   timer_sleep_us(pCtx->I2CDelay);         // send (N)ACK bit
 
    i2c_set_scl(pCtx,0);
-   I2C_DLY();         // send (N)ACK bit
+   timer_sleep_us(pCtx->I2CDelay);         // send (N)ACK bit
 
    i2c_set_sda(pCtx,1);
    return d;
@@ -145,20 +153,20 @@ int i2c_tx(ContextI2C *pCtx, unsigned char d)
    for(x=8; x; x--) {
       i2c_set_sda(pCtx,(d & 0x80)>>7);
       d <<= 1;
-      I2C_DLY();
+      timer_sleep_us(pCtx->I2CDelay);
       i2c_set_scl(pCtx,1);
-      I2C_DLY();
+      timer_sleep_us(pCtx->I2CDelay);
       i2c_set_scl(pCtx,0);
    }
    i2c_set_sda(pCtx,1);
-   I2C_DLY();
-   I2C_DLY();
+   timer_sleep_us(pCtx->I2CDelay);
+   timer_sleep_us(pCtx->I2CDelay);
    bit = i2c_get_sda(pCtx);         // possible ACK bit
    i2c_set_scl(pCtx,1);
-   I2C_DLY();
+   timer_sleep_us(pCtx->I2CDelay);
 
    i2c_set_scl(pCtx,0);
-   I2C_DLY();
+   timer_sleep_us(pCtx->I2CDelay);
 
    return !bit;
 }
