@@ -1,15 +1,4 @@
-ifneq ($(PLATFORM),)
-# Save PLATFORM that is specified so we don't need to specify it every time
-   $(shell echo $(PLATFORM) > $(TOPDIR)/.platform)
-else
-   ifneq ("$(wildcard $(TOPDIR)/.platform)","")
-   # Use last PLATFORM specified
-      PLATFORM := $(shell cat $(TOPDIR)/.platform)
-   else
-   # Use default
-      PLATFORM := pano-g2
-   endif
-endif
+PLATFORM ?= pano-g2
 
 ifeq ($(V),)
    Q=@

@@ -5,7 +5,7 @@
 #include "uart_lite.h"
 #include "uart_lite_defs.h"
 
-#define DEBUG_LOGGING
+// #define DEBUG_LOGGING
 #include "log.h"
 
 //-----------------------------------------------------------------
