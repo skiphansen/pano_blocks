@@ -36,7 +36,10 @@ $(error "XILINX_ISE not set - e.g. export XILINX_ISE=/opt/Xilinx/14.7/ISE_DS/ISE
 endif
 TOOL_PATH    := $(XILINX_ISE)
 
-SRC_FILES := $(filter-out $(EXCLUDE_SRC),$(foreach _dir,$(SRC_DIR), $(wildcard $(_dir)/*.v)))
+VERILOG_SRCS := $(filter-out $(EXCLUDE_SRC),$(foreach _dir,$(SRC_DIR), $(wildcard $(_dir)/*.v)))
+VHDL_SRCS := $(filter-out $(EXCLUDE_SRC),$(foreach _dir,$(SRC_DIR), $(wildcard $(_dir)/*.vhd)))
+SRC_FILES := $(VERILOG_SRCS) $(VHDL_SRCS)
+VPATH = $(SRC_DIR)
 
 ###############################################################################
 # Rules:
@@ -80,7 +83,8 @@ endif
 ###############################################################################
 $(PROJECT_DIR)/$(PROJECT).prj: $(PROJECT_DIR)/$(PROJECT).ut $(PROJECT_DIR)/$(PROJECT).xst
 	@touch $@
-	@$(foreach _file,$(SRC_FILES),echo "verilog work \"$(abspath $(_file))\"" >> $@;)
+	@$(foreach _file,$(VERILOG_SRCS),echo "verilog work \"$(abspath $(_file))\"" >> $@;)
+	@$(foreach _file,$(VHDL_SRCS),echo "vhdl work \"$(abspath $(_file))\"" >> $@;)
 ###############################################################################
 # PROJECT.ucf
 ###############################################################################
@@ -89,10 +93,13 @@ UCF_FILES += $(foreach _dir,$(SRC_DIR), $(wildcard $(_dir)/*_$(PANO_SERIES).ucf)
 $(UCF_FILE): $(UCF_FILES)
 	cat $^ > $@
 
+XCO_FILES += $(foreach _dir,$(SRC_DIR), $(wildcard $(_dir)/*.xco))
+NGC_FILES += $(foreach _file,$(XCO_FILES), $(PROJECT_DIR)/$(addsuffix .ngc,$(basename $(notdir $(_file)))))
+
 ###############################################################################
 # Rule: Synth
 ###############################################################################
-$(PROJECT_DIR)/$(PROJECT).ngc: $(PROJECT_DIR)/$(PROJECT).prj $(SRC_FILES) $(INIT_IMAGE)
+$(PROJECT_DIR)/$(PROJECT).ngc: $(PROJECT_DIR)/$(PROJECT).prj $(NGC_FILES) $(SRC_FILES) $(INIT_IMAGE)
 	@echo "####################################################################"
 	@echo "# ISE: Synth"
 	@echo "####################################################################"
@@ -174,6 +181,21 @@ update_ram:
 BSCAN_SPI_BITFILE = $(BSCAN_SPI_DIR)/$(PART_NAME).bit
 prog_fpga:
 	$(XC3SPROG) $(XC3SPROG_OPTS) -I$(BSCAN_SPI_BITFILE) $(PLATFORM_BITFILE)
+
+###############################################################################
+# Rule: build .ngc from .xco
+###############################################################################
+$(PROJECT_DIR)/$(PROJECT).cgp:
+	if [ -e $(PROJECT).cgp ]; then cp $(PROJECT).cgp $(PROJECT_DIR); else \
+	cp $(MAKE_DIR)/default.cgp $(PROJECT_DIR)/$(PROJECT).cgp; fi
+	echo "SET workingdirectory = ./tmp/" >> $@
+	echo "SET devicefamily = spartan6" >> $@
+	echo "SET device = $(PART_NAME)" >> $@
+	echo "SET package = $(PART_PACKAGE)" >> $@
+	echo "SET speedgrade = -$(PART_SPEED)" >> $@
+
+$(PROJECT_DIR)/%.ngc: %.xco $(PROJECT_DIR)/$(PROJECT).cgp
+	(cd $(PROJECT_DIR); coregen -p $(PROJECT).cgp -b  $<)
 
 include $(MAKE_DIR)/tools.mk
 

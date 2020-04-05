@@ -9,14 +9,14 @@ endif
 
 # directory related
 MAKE_DIR     := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-CORES_DIR    := $(TOPDIR)/cores
-PANO_DIR     := $(TOPDIR)/pano
+CORES_DIR    := $(abspath $(TOPDIR)/cores)
+PANO_DIR     := $(abspath $(TOPDIR)/pano)
 PANO_CORES_DIR := $(PANO_DIR)/cores
 PANO_FW_DIR  := $(PANO_DIR)/fw
 TOOLS_DIR    := $(PANO_DIR)/tools
 CPU_CORE_DIR := $(CORES_DIR)/cpu/riscv
-PREBUILT_DIR := $(TOPDIR)/prebuilt
-PANO_RTL_DIR := $(TOPDIR)/fpga
+PREBUILT_DIR := $(abspath $(TOPDIR)/prebuilt)
+PANO_RTL_DIR := $(abspath $(TOPDIR)/fpga)
 RTL_INIT_MEM := $(PANO_RTL_DIR)/firmware.mem
 BSCAN_SPI_DIR := $(PANO_CORES_DIR)/xc3sprog
 
