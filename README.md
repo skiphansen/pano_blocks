@@ -29,6 +29,7 @@ article and refer to the links at the bottom of this page for further reading.
 - Skip Hansen's [Hello World](https://github.com/skiphansen/pano_hello_g1) project.
 - Skip Hansen's [USB sniffer](https://github.com/skiphansen/usb_sniffer/blob/master/fpga/panologic_g2) project.
 - Skip Hansen's [NES Emulator](https://github.com/skiphansen/panog2_nes) project.
+- Skip Hansen's [USB sniffer](https://github.com/skiphansen/usb_sniffer/tree/master/fpga/panologic_g2) project.
 - https://github.com/tomverbeure/panologic
 - G1 [Schematics!](https://github.com/twj42/PanoLogicG2_ReverseEngineering/blob/master/files/G1_Schematics.zip)
 - https://github.com/tomverbeure/panologic-g2
