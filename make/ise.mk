@@ -39,16 +39,14 @@ TOOL_PATH    := $(XILINX_ISE)
 VERILOG_SRCS := $(filter-out $(EXCLUDE_SRC),$(foreach _dir,$(SRC_DIR), $(wildcard $(_dir)/*.v)))
 VHDL_SRCS := $(filter-out $(EXCLUDE_SRC),$(foreach _dir,$(SRC_DIR), $(wildcard $(_dir)/*.vhd)))
 SRC_FILES := $(VERILOG_SRCS) $(VHDL_SRCS)
+BIT_FILE = $(PROJECT_DIR)/${PROJECT}_routed.bit
 VPATH = $(SRC_DIR)
 
 ###############################################################################
 # Rules:
 ###############################################################################
-all: bitstream $(PLATFORM_BITFILE)
 
-BIT_FILE = $(PROJECT_DIR)/${PROJECT}_routed.bit
-
-bitstream: $(BIT_FILE)
+all: $(PROJECT_DIR) $(NGC_FILES) $(BIT_FILE) $(PLATFORM_BITFILE)
 
 clean:
 	rm -rf $(PROJECT_DIR)
@@ -82,9 +80,12 @@ endif
 # PROJECT.prj
 ###############################################################################
 $(PROJECT_DIR)/$(PROJECT).prj: $(PROJECT_DIR)/$(PROJECT).ut $(PROJECT_DIR)/$(PROJECT).xst
-	@touch $@
+	touch $@
 	@$(foreach _file,$(VERILOG_SRCS),echo "verilog work \"$(abspath $(_file))\"" >> $@;)
 	@$(foreach _file,$(VHDL_SRCS),echo "vhdl work \"$(abspath $(_file))\"" >> $@;)
+	@$(foreach _file,$(wildcard $(PROJECT_DIR)/*.v),echo "verilog work \"$(abspath $(_file))\"" >> $@;)
+	@$(foreach _file,$(wildcard $(PROJECT_DIR)/*.vhd),echo "vhdl work \"$(abspath $(_file))\"" >> $@;)
+
 ###############################################################################
 # PROJECT.ucf
 ###############################################################################
@@ -99,7 +100,7 @@ NGC_FILES += $(foreach _file,$(XCO_FILES), $(PROJECT_DIR)/$(addsuffix .ngc,$(bas
 ###############################################################################
 # Rule: Synth
 ###############################################################################
-$(PROJECT_DIR)/$(PROJECT).ngc: $(PROJECT_DIR)/$(PROJECT).prj $(NGC_FILES) $(SRC_FILES) $(INIT_IMAGE)
+$(PROJECT_DIR)/$(PROJECT).ngc: $(NGC_FILES) $(PROJECT_DIR)/$(PROJECT).prj $(SRC_FILES) $(INIT_IMAGE)
 	@echo "####################################################################"
 	@echo "# ISE: Synth"
 	@echo "####################################################################"
