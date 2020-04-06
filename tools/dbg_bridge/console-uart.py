@@ -22,7 +22,6 @@ def main(argv):
     parser.add_argument('-t', dest='type',   default='uart',                     help='Device type (uart|ftdi)')
     parser.add_argument('-d', dest='device', default='/dev/ttyUSB1',             help='Serial Device')
     parser.add_argument('-b', dest='baud',   default=1000000,       type=int,    help='Baud rate')
-    parser.add_argument('-f', dest='filename',required=True,                     help='File to load symbols from')
     args = parser.parse_args()
 
     global bus_if
