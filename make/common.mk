@@ -9,6 +9,7 @@ endif
 
 # directory related
 MAKE_DIR     := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+PATCHES_DIR  := $(abspath $(TOPDIR)/patches)
 CORES_DIR    := $(abspath $(TOPDIR)/cores)
 PANO_DIR     := $(abspath $(TOPDIR)/pano)
 PANO_CORES_DIR := $(PANO_DIR)/cores
