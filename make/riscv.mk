@@ -4,7 +4,7 @@
 # GCC_PREFIX     = arch-toolchain-
 GCC_PREFIX=riscv32-unknown-elf-
 # ARCH_CFLAGS
-#ARCH_CFLAGS=
+ARCH_CFLAGS=
 # ARCH_LFLAGS
 ARCH_LFLAGS=
 # FPIC           = yes | no
@@ -40,7 +40,7 @@ EXTRA_CFLAGS += -DLINK_TYPE_RAM
 # Board Settings
 ###############################################################################
 
-ifeq ($(TARGET_IS_LIB),)
+ifneq ($(TARGET_IS_LIB),y)
   BOOT_SRC    := $(PLATFORM_DIR)/boot.S
   SRC_DIR     += $(PLATFORM_DIR)
   ARCH_LFLAGS += -T$(PLATFORM_DIR)/$(LINKER_SCRIPT)

@@ -28,7 +28,6 @@ OPT ?= 0
 # Arch options
 ###############################################################################
 ifneq ($(ARCH),)
-  TARGET_IS_LIB=no
   include $(MAKE_DIR)/$(ARCH).mk
 endif
 

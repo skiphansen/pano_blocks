@@ -2,7 +2,7 @@ include ../../../project.mk
 
 TARGET       = lwip.a
 TARGET_IS_LIB = y
-NOLIBSTD = y
+NOLIBSTD := y
 
 LWIP_GIT      := git://git.savannah.gnu.org/lwip.git
 LWIP_BASE_COMMIT := 3f47b04f16a874c05def88dcda6b3e0a2d6684ce
