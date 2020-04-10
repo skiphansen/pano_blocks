@@ -11,27 +11,27 @@ article and refer to the links at the bottom of this page for further reading.
 
 ## Projects using these blocks
 
-- Skip Hansen's [OPL3 port](https://github.com/skiphansen/panog2_opl3) for the G2
-- Skip Hansen's [NES Emulator](https://github.com/skiphansen/panog2_nes) project.
+- Skip's [OPL3 port](https://github.com/skiphansen/panog2_opl3) for the G2
+- Skip's [NES Emulator](https://github.com/skiphansen/panog2_nes) project.
+- Skip's [USB sniffer](https://github.com/skiphansen/usb_sniffer/blob/master/fpga/panog2_usb_sniffer) project
 
 ## Pano Links
 
 - [Gitter](https://gitter.im/panologic/community) chat room for Panologic hackers.
-- Group.io [group](https://groups.io/g/panohackers/topics) for discussions about Panologic hacking 
 - [Original Hackaday](https://hackaday.com/2013/01/11/ask-hackaday-we-might-have-some-fpgas-to-hack/) article from 2013.  
 - Hackaday article on Tom's [Raytracker](https://hackaday.com/2018/12/07/racing-the-beam-on-a-thin-client-in-fpgas/).  
-- Hackaday article on my [Pacman](https://hackaday.com/2019/01/11/pac-man-fever-comes-to-the-pano-logic-fpga/) project.  
+- Hackaday article on Skip's [Pacman](https://hackaday.com/2019/01/11/pac-man-fever-comes-to-the-pano-logic-fpga/) project.  
 - Hackaday article on Tom's [Joystick adapter](https://hackaday.com/2019/02/11/two-joysticks-talk-to-fpga-arcade-game-over-a-vga-cable/).  
 - Wenting Zhang's [VerilogBoy](https://github.com/zephray/VerilogBoy) project.
-- Hackaday article on Skip Hansen's [pano_progfpga](https://hackaday.com/2019/04/19/pano-logic-fgpa-hacking-just-got-easier/) project
-- Skip Hansen's [prog_fpga](https://github.com/skiphansen/pano_progfpga) project.
-- Skip Hansen's [pacman](https://github.com/skiphansen/pano_man) project.
-- Skip Hansen's [Hello World](https://github.com/skiphansen/pano_hello_g1) project.
-- Skip Hansen's [USB sniffer](https://github.com/skiphansen/usb_sniffer/blob/master/fpga/panologic_g2) project.
-- Skip Hansen's [NES Emulator](https://github.com/skiphansen/panog2_nes) project.
-- Skip Hansen's [USB sniffer](https://github.com/skiphansen/usb_sniffer/tree/master/fpga/panologic_g2) project.
-- https://github.com/tomverbeure/panologic
+- Hackaday article on Skip's [pano_progfpga](https://hackaday.com/2019/04/19/pano-logic-fgpa-hacking-just-got-easier/) project
+- Tom's G1 reverse engineering [project](https://github.com/tomverbeure/panologic)
+- Tom's G2 reverse engineering [project](https://github.com/tomverbeure/panologic-g2)
+- Skip's [prog_fpga](https://github.com/skiphansen/pano_progfpga) project.
+- Skip's [pacman](https://github.com/skiphansen/pano_man) project.
+- Skip's [Hello World](https://github.com/skiphansen/pano_hello_g1) project.
+- Skip's [USB sniffer](https://github.com/skiphansen/usb_sniffer/blob/master/fpga/panologic_g2) project
+- Skip's other [USB sniffer](https://github.com/skiphansen/usb_sniffer/blob/master/fpga/panog2_usb_sniffer) project
+- Skip's [NES Emulator](https://github.com/skiphansen/panog2_nes) project.
+- Tim Jones's G2 reverse engineering [information](https://twj42.github.io/PanoLogicG2_ReverseEngineering/)
 - G1 [Schematics!](https://github.com/twj42/PanoLogicG2_ReverseEngineering/blob/master/files/G1_Schematics.zip)
-- https://github.com/tomverbeure/panologic-g2
-- https://twj42.github.io/PanoLogicG2_ReverseEngineering/
-
+- [Linux](https://github.com/timvideos/litex-buildenv/wiki/HowTo-Linux-on-Pano-Logic-G2) on a G2!
