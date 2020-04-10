@@ -148,7 +148,7 @@ $(RTL_INIT_MEM): $(BUILD_DIR)/$(TARGET).bin
 	@echo "# Building $(notdir $@)"
 	$(Q)$(CREATE_MIF) -d 16384 -f mem -w 32 -o 0 -i 1 $(BUILD_DIR)/$(TARGET).bin > $(RTL_INIT_MEM)
 
-init_image: $(RTL_INIT_MEM)	
+init_image: all $(RTL_INIT_MEM)	
 
 run: $(BUILD_DIR)/$(TARGET)
 	$(RUN_PREFIX) $(BUILD_DIR)/$(TARGET) $(RUN_ARGS)
