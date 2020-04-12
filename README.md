@@ -35,3 +35,6 @@ article and refer to the links at the bottom of this page for further reading.
 - Tim Jones's G2 reverse engineering [information](https://twj42.github.io/PanoLogicG2_ReverseEngineering/)
 - G1 [Schematics!](https://github.com/twj42/PanoLogicG2_ReverseEngineering/blob/master/files/G1_Schematics.zip)
 - [Linux](https://github.com/timvideos/litex-buildenv/wiki/HowTo-Linux-on-Pano-Logic-G2) on a G2!
+- Ttsiodras's blog [post](https://www.thanassis.space/myowncpu.html) about porTtsiodrasting the LEON (a SPARC derivative) processor to the G2.
+- Hackaday [article](https://hackaday.com/2019/11/01/sparc-cpu-in-a-cheap-fpga/) about Ttsiodras's port.
+

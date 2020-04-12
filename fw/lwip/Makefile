@@ -11,6 +11,7 @@ LWIP_PATCH_DIR := $(abspath ./patches)
 
 # source to include
 SRC_DIR	    += $(LWIP_DIR)/src/core
+SRC_DIR	    += $(LWIP_DIR)/src/api
 SRC_DIR	    += $(LWIP_DIR)/src/core/ipv4
 EXTRA_SRC   += $(LWIP_DIR)/src/netif/ethernet.c
 
