@@ -9,6 +9,10 @@ LWIP_BASE_COMMIT := 3f47b04f16a874c05def88dcda6b3e0a2d6684ce
 LWIP_SRC := $(abspath ./lwip)
 LWIP_PATCH_DIR := $(abspath ./patches)
 
+ifneq ($(MAKECMDGOALS),distclean)
+GIT_INIT := $(shell if [ ! -e $(LWIP_SRC) ]; then git clone $(LWIP_GIT);fi)
+endif
+
 # source to include
 SRC_DIR	    += $(LWIP_SRC)/src/core
 SRC_DIR	    += $(LWIP_SRC)/src/api
@@ -31,10 +35,7 @@ PATCHES := $(wildcard $(LWIP_PATCH_DIR)/*)
 
 init: $(LWIP_SRC)/.patched
 
-$(LWIP_SRC):
-	git clone $(LWIP_GIT)
-
-$(LWIP_SRC)/.patched: $(PATCHES) | $(LWIP_SRC)
+$(LWIP_SRC)/.patched: $(PATCHES)
 ifneq ($(PATCHES),)
 	(cd $(LWIP_SRC);git reset $(LWIP_BASE_COMMIT) --hard)
 	(cd $(LWIP_SRC);git am $(LWIP_PATCH_DIR)/*)
