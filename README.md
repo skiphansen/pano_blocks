@@ -30,7 +30,7 @@ article and refer to the links at the bottom of this page for further reading.
 - Skip's [pacman](https://github.com/skiphansen/pano_man) project.
 - Skip's [Hello World](https://github.com/skiphansen/pano_hello_g1) project.
 - Skip's [USB sniffer](https://github.com/skiphansen/usb_sniffer/blob/master/fpga/panologic_g2) project
-- Skip's other [USB sniffer](https://github.com/skiphansen/usb_sniffer/blob/master/fpga/panog2_usb_sniffer) project
+- Skip's other [USB sniffer](https://github.com/skiphansen/panog2_usb_sniffer) project
 - Skip's [NES Emulator](https://github.com/skiphansen/panog2_nes) project.
 - Tim Jones's G2 reverse engineering [information](https://twj42.github.io/PanoLogicG2_ReverseEngineering/)
 - G1 [Schematics!](https://github.com/twj42/PanoLogicG2_ReverseEngineering/blob/master/files/G1_Schematics.zip)
