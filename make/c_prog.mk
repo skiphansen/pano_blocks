@@ -1,4 +1,3 @@
-include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/common.mk
 ###############################################################################
 # Inputs
 ###############################################################################
@@ -29,7 +28,6 @@ OPT ?= 0
 # Arch options
 ###############################################################################
 ifneq ($(ARCH),)
-  TARGET_IS_LIB=no
   include $(MAKE_DIR)/$(ARCH).mk
 endif
 
@@ -53,6 +51,7 @@ COMPILER     ?= g++
 GCC          = $(GCC_PREFIX)$(COMPILER)
 OBJCOPY      = $(GCC_PREFIX)objcopy
 OBJDUMP      = $(GCC_PREFIX)objdump
+AR	     = $(GCC_PREFIX)ar
 CP	     = cp   
 LN	     = ln
 DATA2MEM     = data2mem   
@@ -91,7 +90,7 @@ LFLAGS 	     += -Wl,-Map=$(BUILD_DIR)/$(TARGET).map
 src2obj       = $(BUILD_DIR)/$(patsubst %$(suffix $(1)),%.o,$(notdir $(1)))
 src2dep       = $(BUILD_DIR)/$(patsubst %,%.d,$(notdir $(1)))
 
-SRC          := $(BOOT_SRC) $(EXTRA_SRC) $(foreach src,$(SRC_DIR),$(wildcard $(src)/*.cpp)) $(foreach src,$(SRC_DIR),$(wildcard $(src)/*.c))
+SRC          := $(BOOT_SRC) $(EXTRA_SRC) $(filter-out $(EXCLUDE_SRC), $(foreach src,$(SRC_DIR),$(wildcard $(src)/*.cpp)) $(foreach src,$(SRC_DIR),$(wildcard $(src)/*.c)))
 OBJ          ?= $(foreach src,$(SRC),$(call src2obj,$(src)))
 DEPS         ?= $(foreach src,$(SRC),$(call src2dep,$(src)))
 
@@ -131,7 +130,11 @@ $(foreach src,$(SRC),$(eval $(call template_c,$(src))))
 
 $(BUILD_DIR)/$(TARGET): $(OBJ) | $(BUILD_DIR)/ 
 	@echo "# Building $(notdir $@)"
+ifeq ($(suffix $(BUILD_DIR)/$(TARGET)),.a)
+	$(Q)$(AR) rcs $(BUILD_DIR)/$(TARGET) $(OBJ)
+else
 	$(Q)$(GCC) -o $(BUILD_DIR)/$(TARGET) $(OBJ) $(LFLAGS)
+endif
 
 $(BUILD_DIR)/$(TARGET).bin: $(BUILD_DIR)/$(TARGET)
 	@echo "# Building $(notdir $@)"
@@ -145,7 +148,7 @@ $(RTL_INIT_MEM): $(BUILD_DIR)/$(TARGET).bin
 	@echo "# Building $(notdir $@)"
 	$(Q)$(CREATE_MIF) -d 16384 -f mem -w 32 -o 0 -i 1 $(BUILD_DIR)/$(TARGET).bin > $(RTL_INIT_MEM)
 
-init_image: $(RTL_INIT_MEM)	
+init_image: all $(RTL_INIT_MEM)	
 
 run: $(BUILD_DIR)/$(TARGET)
 	$(RUN_PREFIX) $(BUILD_DIR)/$(TARGET) $(RUN_ARGS)

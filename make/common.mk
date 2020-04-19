@@ -9,6 +9,7 @@ endif
 
 # directory related
 MAKE_DIR     := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+PATCHES_DIR  := $(abspath $(TOPDIR)/patches)
 CORES_DIR    := $(abspath $(TOPDIR)/cores)
 PANO_DIR     := $(abspath $(TOPDIR)/pano)
 PANO_CORES_DIR := $(PANO_DIR)/cores
@@ -29,4 +30,5 @@ XC3SPROG      ?= xc3sprog
 TARGET_BAUD ?= 1000000
 TARGET_PORT ?= /dev/ttyUSB1
 RUN_PREFIX  := $(TOOLS_DIR)/dbg_bridge/run.py -d $(TARGET_PORT) -b $(TARGET_BAUD) -f 
+CONSOLE_PREFIX  := $(TOOLS_DIR)/dbg_bridge/console.py -d $(TARGET_PORT) -b $(TARGET_BAUD)
 
