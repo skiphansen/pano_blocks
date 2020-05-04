@@ -21,6 +21,12 @@ else ifeq ($(PLATFORM),pano-g2)
     PART_PACKAGE = fgg484
     PART_SPEED   = 2
     PANO_SERIES  = g2
+else ifeq ($(PLATFORM),pano_logic_g2)
+# for compatibility with litex-buildenv
+    PART_NAME    = xc6slx150
+    PART_PACKAGE = fgg484
+    PART_SPEED   = 2
+    PANO_SERIES  = g2
 else
    $(error Unknown PLATFORM $(PLATFORM))
 endif
