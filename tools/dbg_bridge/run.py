@@ -18,6 +18,11 @@ def main(argv):
 
     run_path = os.path.dirname(os.path.realpath(__file__))
 
+    # Set reset inactive before setting it active in case this is the first run
+    # after loading the bitstream
+    cmd = "%s/poke.py -t %s -d %s -b %s -a 0xF0000000 -v 0x1" % (run_path, args.type, args.device, args.baud)
+    print cmd
+    os.system(cmd)
     cmd = "%s/poke.py -t %s -d %s -b %s -a 0xF0000000 -v 0x0" % (run_path, args.type, args.device, args.baud)
     print cmd
     os.system(cmd)

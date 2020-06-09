@@ -40,8 +40,8 @@ $(error "XILINX_ISE not set - e.g. export XILINX_ISE=/opt/Xilinx/14.7/ISE_DS/ISE
 endif
 TOOL_PATH    := $(XILINX_ISE)
 
-VERILOG_SRCS := $(filter-out $(EXCLUDE_SRC),$(foreach _dir,$(SRC_DIR), $(wildcard $(_dir)/*.v)))
-VHDL_SRCS := $(filter-out $(EXCLUDE_SRC),$(foreach _dir,$(SRC_DIR), $(wildcard $(_dir)/*.vhd)))
+VERILOG_SRCS += $(filter-out $(EXCLUDE_SRC),$(abspath $(foreach _dir,$(SRC_DIR), $(wildcard $(_dir)/*.v)))$(EXTRA_SRC))
+VHDL_SRCS := $(filter-out $(EXCLUDE_SRC),$(abspath $(foreach _dir,$(SRC_DIR), $(wildcard $(_dir)/*.vhd)))$(EXTRA_SRC))
 SRC_FILES := $(VERILOG_SRCS) $(VHDL_SRCS)
 BIT_FILE = $(PROJECT_DIR)/${PROJECT}_routed.bit
 VPATH = $(SRC_DIR)
@@ -75,7 +75,7 @@ $(PROJECT_DIR)/$(PROJECT).xst: | $(PROJECT_DIR)
 	echo "-ofn $(PROJECT)" >> $@
 	echo "-p $(PART_NAME)-$(PART_SPEED)-$(PART_PACKAGE)" >> $@
 	echo "-top $(TOP_MODULE)" >> $@
-ifneq ($(EXTRA_VFLAGS),-g2-c)
+ifneq ($(EXTRA_VFLAGS),)
 	echo "-define {$(EXTRA_VFLAGS)}" >> $@
 endif
 
@@ -83,12 +83,12 @@ endif
 ###############################################################################
 # PROJECT.prj
 ###############################################################################
-$(PROJECT_DIR)/$(PROJECT).prj: $(PROJECT_DIR)/$(PROJECT).ut $(PROJECT_DIR)/$(PROJECT).xst
-	touch $@
-	@$(foreach _file,$(VERILOG_SRCS),echo "verilog work \"$(abspath $(_file))\"" >> $@;)
-	@$(foreach _file,$(VHDL_SRCS),echo "vhdl work \"$(abspath $(_file))\"" >> $@;)
-	@$(foreach _file,$(wildcard $(PROJECT_DIR)/*.v),echo "verilog work \"$(abspath $(_file))\"" >> $@;)
-	@$(foreach _file,$(wildcard $(PROJECT_DIR)/*.vhd),echo "vhdl work \"$(abspath $(_file))\"" >> $@;)
+$(PROJECT_DIR)/$(PROJECT).prj: $(PROJECT_DIR)/$(PROJECT).ut $(PROJECT_DIR)/$(PROJECT).xst $(firstword $(MAKEFILE_LIST))
+	@if [ -e $@ ] ; then rm $@; fi
+	@$(foreach _file,$(VERILOG_SRCS),echo "verilog work \"$(_file)\"" >> $@;)
+	@$(foreach _file,$(VHDL_SRCS),echo "vhdl work \"$(_file)\"" >> $@;)
+	@$(foreach _file,$(abspath $(wildcard $(PROJECT_DIR)/*.v)),echo "verilog work \"$(_file)\"" >> $@;)
+	@$(foreach _file,$(abspath $(wildcard $(PROJECT_DIR)/*.vhd)),echo "vhdl work \"$(_file)\"" >> $@;)
 
 ###############################################################################
 # PROJECT.ucf
