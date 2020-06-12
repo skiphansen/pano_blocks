@@ -65,7 +65,11 @@ struct irq_context * exception_handler(struct irq_context *ctx)
             ctx = _exception_table[ctx->cause](ctx);
         else
         {
+           int i;
             printf("Unhandled exception: PC 0x%08x Cause %d!\n", ctx->pc, ctx->cause);
+            for(i = 0; i < NUM_GP_REG; i++) {
+               printf("x%d: 0x%08x\n", i,ctx->reg[i]);
+            }
             assert(!"Unhandled exception");
         }
     }
