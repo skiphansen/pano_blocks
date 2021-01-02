@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 import argparse
 
@@ -37,7 +37,7 @@ def main(argv):
     bus_if.set_progress_cb(print_progress)
 
     addr   = int(args.address, 0)
-    print "Dump: %d bytes from 0x%08x" % (args.size, addr)
+    print("Dump: %d bytes from 0x%08x" % (args.size, addr))
 
     # Read from target
     data   = bus_if.read(addr, args.size)

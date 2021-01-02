@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 import argparse
 from elftools.elf.elffile import ELFFile
@@ -35,7 +35,7 @@ def load_elf(filename, bus_if):
       length      = sg['p_filesz']
       data        = sg.data()      
       if data:
-        print "ELF: Loading 0x%x - size %dKB" % (load_addr, (length+1023) / 1024)
+        print("ELF: Loading 0x%x - size %dKB" % (load_addr, (length+1023) / 1024))
         bus_if.write(load_addr, bytearray(data), length)
 
 ##################################################################

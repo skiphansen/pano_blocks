@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 import argparse
 import sys
@@ -38,7 +38,7 @@ def main(argv):
         if bus_if.bus.uart.in_waiting > 0:
             ch = bus_if.bus.uart.read(1)
             if ch != None:
-                sys.stdout.write(ch)
+                sys.stdout.write(str(ch,'utf-8'))
                 sys.stdout.flush()     
         
         ch = stdio_read()

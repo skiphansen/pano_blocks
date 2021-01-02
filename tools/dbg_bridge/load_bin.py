@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 import argparse
 
@@ -47,22 +47,22 @@ def main(argv):
         filesize = args.size
 
     addr   = int(args.address, 0)
-    print "Load: %d bytes to 0x%08x" % (filesize, addr)
+    print("Load: %d bytes to 0x%08x" % (filesize, addr))
 
     # Write to target
     bus_if.write(addr, data, filesize)
 
     # Verification
     if args.verify:
-        print "Verify:"
+        print("Verify:")
         data_rb = bus_if.read(addr, filesize)
 
         for i in range(filesize):
             if data_rb[i] != ord(data[i]):
-                print "Data mismatches @ %d: %s != %d" % (addr + i,  str(data_rb[i]), ord(data[i]))
+                print("Data mismatches @ %d: %s != %d" % (addr + i,  str(data_rb[i]), ord(data[i])))
                 sys.exit(-1)
 
-        print "Verify: Done"
+        print("Verify: Done")
 
 if __name__ == "__main__":
    main(sys.argv[1:])

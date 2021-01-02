@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 import sys
 import argparse
 import os
@@ -22,20 +22,20 @@ def main(argv):
     # after loading the bitstream
     cmd = "%s/poke.py -t %s -d %s -b %s -a 0xF0000000 -v 0x1" % (run_path, args.type, args.device, args.baud)
     for i in range(0,3):
-        print cmd
+        print(cmd)
         if os.system(cmd) == 0:
             break
 
     cmd = "%s/poke.py -t %s -d %s -b %s -a 0xF0000000 -v 0x0" % (run_path, args.type, args.device, args.baud)
-    print cmd
+    print(cmd)
     os.system(cmd)
 
     cmd = "%s/load.py -t %s -d %s -b %s -f %s -p '%s'" % (run_path, args.type, args.device, args.baud, args.filename, args.progargs)
-    print cmd
+    print(cmd)
     os.system(cmd)
 
     cmd = "%s/console-uart.py -t %s -d %s -b %s" % (run_path, args.type, args.device, args.baud)
-    print cmd
+    print(cmd)
     os.system(cmd)
 
 if __name__ == "__main__":
