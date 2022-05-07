@@ -27,16 +27,23 @@
 #define VERBOSE_DEBUG_LOGGING
 #include "log.h"
 
-#ifdef PANO_G2
-#define PAGE_SIZE          (256)
-#define SECTOR_SIZE        (256*1024)
-#define FLASH_SIZE         (16*1024*1024)
-#elif defined(PANO_G2_C)
-#define SECTOR_SIZE        (64*1024)
-#define FLASH_SIZE         (8*1024*1024)
-#else
-#error Unknown platform
-#endif
+typedef struct {
+   uint32_t FlashSize;
+   uint32_t PageSize;
+   uint32_t SectorSize;
+   uint8_t  DevId[3];
+   const char *Desc;
+} FlashInfo_t;
+
+const FlashInfo_t gChipInfo[] = {
+// PANO_G2 Rev C, 8 Megabytes
+   {8*1024*1024,256,64*1024,{0x20,0x20,0x17},"M25P64"},
+// PANO_G2 Rev B, 16 Megabytes
+   {16*1024*1024,256,256*1024,{0x20,0x20,0x18},"M25P128"},
+   {0}   // end of table
+};
+
+static const FlashInfo_t *gChip;
 
 #define CMD_WRITE_STATUS   0x01
 #define CMD_PAGE_PRG       0x02
@@ -90,14 +97,20 @@ int spi_chip_init()
 {
    int Ret = -1;  // assume the worse
    uint8_t DeviceID[3];
-   const uint8_t M25P128_ID[3] = {0x20,0x20,0x18};
+   const FlashInfo_t *p = gChipInfo;
 
    spi_read_device_id(DeviceID);
-   if(memcmp(DeviceID,M25P128_ID,3) == 0) {
-      ALOG("M25P128 detected\n");
-      Ret = 0;
+   while(p->FlashSize != 0) {
+      if(memcmp(p->DevId,DeviceID,sizeof(p->DevId)) == 0) {
+         ALOG("%s detected\n",p->Desc);
+         gChip = p;
+         Ret = 0;
+         break;
+      }
+      p++;
    }
-   else {
+
+   if(Ret != 0) {
       ELOG("Unknown DeviceID ");
       LOG_HEX(DeviceID,sizeof(DeviceID));
    }
@@ -125,16 +138,21 @@ int spi_write(uint32_t Adr,uint8_t *pData,uint32_t Len)
    int Bytes2Write;
    int BytesLeftInPage;
    int Wrote = 0;
+   const FlashInfo_t *p = gChip;
 
    do {
-      if(Adr + Len > FLASH_SIZE) {
+      if(p == NULL) {
+         ELOG("Unknown chip\n");
+         break;
+      }
+      if(Adr + Len > p->FlashSize) {
          ELOG("Invalid length 0x%x\n",Len);
          break;
       }
       spi_write_enable(true);
       while(Wrote < Len) {
          Bytes2Write = Len;
-         BytesLeftInPage = PAGE_SIZE - (Adr % PAGE_SIZE);
+         BytesLeftInPage = p->PageSize - (Adr % p->PageSize);
          if(Bytes2Write > BytesLeftInPage) {
             Bytes2Write = BytesLeftInPage;
          }
@@ -158,20 +176,25 @@ int spi_erase(uint32_t Adr, uint32_t Len)
 {
    int i;
    int Ret = -1;  // assume the wrose
+   const FlashInfo_t *p = gChip;
 
    VLOG("Adr 0x%x, size 0x%x\n",Adr,Len);
    do {
-      if((Adr % SECTOR_SIZE) != 0) {
+      if(p == NULL) {
+         ELOG("Unknown chip\n");
+         break;
+      }
+      if((Adr % p->SectorSize) != 0) {
          ELOG("Invalid address 0x%x, not start of sector\n",Adr);
          break;
       }
 
-      if(Adr + Len > FLASH_SIZE) {
+      if((Adr + Len) > p->FlashSize) {
          ELOG("Invalid length 0x%x\n",Len);
          break;
       }
       spi_write_enable(true);
-      for(i = 0; i < Len / SECTOR_SIZE; i++) {
+      for(i = 0; i < (Len / p->SectorSize); i++) {
          VLOG("Erasing sector %d @ 0x%x\n",i + 1,Adr);
          spi_cs(0);
          spi_sendrecv(CMD_SECTOR_ERASE);
@@ -180,9 +203,8 @@ int spi_erase(uint32_t Adr, uint32_t Len)
          spi_sendrecv((uint8_t) (Adr & 0xff));
          spi_cs(1);
          while(spi_read_status() & STATUS_WIP);
-         Adr += SECTOR_SIZE;
+         Adr += p->SectorSize;
       }
-
    } while(false);
 
    return Ret;
