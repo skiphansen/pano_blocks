@@ -24,13 +24,10 @@ typedef enum {
    RESULT_NO_SUPPORT,// Comamnd is defined, but not supported (yet/here)
    RESULT_BAD_ARG,   // One or more of the arguments are wrong or missing
    RESULT_USAGE,     // Display command usage
-   RESULT_NO_INIT    // CmdParserInit() hasn't been called
+   RESULT_NO_INIT,   // CmdParserInit() hasn't been called
+   RESULT_ERR,       // Command failed, but display it's own error message
+   RESULT_INTERNAL_ERR
 } CommandResults_t;
-
-typedef enum {
-   CMD_FLAG_EXACT = 0x1,   // Require exact match (no abbreviations)
-   CMD_FLAG_HIDE = 0x2,    // Don't show command in help
-} CommandFlags_t;
 
 typedef int (*ParserPrintf)(const char *format, ...);
 
@@ -38,17 +35,19 @@ typedef struct {
    const char *CmdString;     // Command name
    const char *HelpString;    // short summary on command usage
    const char *Usage;         // detailed command usage (optional)
-   const int Flags;
-   int (*CmdHandler)(const char *CmdLine);
+   int (*CmdHandler)(char *CmdLine);
 } CommandTable_t;
 
 // Init command line parser, with printf like and command table
 int CmdParserInit(const CommandTable_t *CmdTbl,ParserPrintf Function);
 
 // Parse a command line, calling any matched commands
-CommandResults_t ParseCmd(const char *CmdLine);
+CommandResults_t ParseCmd(char *CmdLine);
+int ConvertValue(char **Arg,uint32_t *Value);
 
-int HelpCmd(const char *CmdLine);
+int HelpCmd(char *CmdLine);
+char *SkipSpaces(char *In);
+char *Skip2Space(char *In);
 
 #endif   // _CMD_PARSER_H_
 

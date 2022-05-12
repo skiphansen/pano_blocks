@@ -16,12 +16,18 @@
  *
  */
 
+#include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+
 // #include <ctype.h>      // NB: don't include this, we use replacments
 int isspace(int c);
-int tolower(int ch);
+int tolower(int c);
+int isdigit(int c);
+int isxdigit(int c);
+
 #include "printf.h"
+#include "_string.h"
 #include "cmd_parser.h"
 #define DEBUG_LOGGING         1
 // #define VERBOSE_DEBUG_LOGGING 1
@@ -33,7 +39,7 @@ static const CommandTable_t *gCmdTbl;
 #define PRINT_F(format, ...) (gPrintf)(format,## __VA_ARGS__)
 
 
-const char *SkipSpaces(const char *In)
+char *SkipSpaces(char *In)
 {
    while(isspace(*In)) {
       In++;
@@ -42,7 +48,7 @@ const char *SkipSpaces(const char *In)
    return In;
 }
 
-const char *Skip2Space(const char *In)
+char *Skip2Space(char *In)
 {
    while(*In != 0 && !isspace(*In)) {
       In++;
@@ -55,7 +61,7 @@ const char *Skip2Space(const char *In)
 // 0 = command doesn't match
 // 1 = command matches
 // 2 = exact command match
-int MatchCmd(const char *CmdLine, const char *Command)
+int MatchCmd(char *CmdLine,const char *Command)
 {
    CmdLine = SkipSpaces(CmdLine);
 
@@ -77,7 +83,7 @@ int MatchCmd(const char *CmdLine, const char *Command)
    return 1;
 }
 
-static const CommandTable_t *FindCmd(const char *CmdLine,int bSilent) 
+static const CommandTable_t *FindCmd(char *CmdLine,int bSilent) 
 {
    int CmdsMatched = 0;
    int MatchResult;
@@ -105,9 +111,8 @@ static const CommandTable_t *FindCmd(const char *CmdLine,int bSilent)
          pCmd++;
       }
 
-      if(CmdsMatched == 0 || 
-         ((Ret->Flags & CMD_FLAG_EXACT) && MatchResult != 2)) 
-      { // command not found or command requires an exact match and it isn't
+      if(CmdsMatched == 0) {
+      // command not found or command requires an exact match and it isn't
          Ret = NULL;
          if(!bSilent) {
             PRINT_F("Error: Unknown command.\n");
@@ -124,11 +129,12 @@ static const CommandTable_t *FindCmd(const char *CmdLine,int bSilent)
    return Ret;
 }
 
-CommandResults_t ParseCmd(const char *CmdLine)
+CommandResults_t ParseCmd(char *CmdLine)
 {
    const CommandTable_t *pCurrentCmd;
-   const char *cp;
+   char *cp;
    CommandResults_t Ret = RESULT_OK; // assume the best
+   bool bDisplayUsage = false;
 
    do {
       if(gPrintf == NULL || gCmdTbl == NULL) {
@@ -145,19 +151,23 @@ CommandResults_t ParseCmd(const char *CmdLine)
          cp = SkipSpaces(cp);
          Ret = pCurrentCmd->CmdHandler(cp);
          if(Ret == RESULT_USAGE) {
-            PRINT_F("Error - Invalid argument(s)\n");
-            PRINT_F("Usage:\n  %s\n",
-                   pCurrentCmd->Usage != NULL ? pCurrentCmd->Usage : 
-                   pCurrentCmd->HelpString);
+            bDisplayUsage = true;
          }
          else if(Ret == RESULT_NO_SUPPORT) {
             PRINT_F("Error - Request not supported yet\n");
          }
          else if(Ret == RESULT_BAD_ARG) {
-            // Error message already displayed
+            bDisplayUsage = true;
+            PRINT_F("Error - Invalid argument(s)\n");
          }
       }
    } while(false);
+
+   if(bDisplayUsage) {
+      PRINT_F("Usage:\n  %s\n",
+             pCurrentCmd->Usage != NULL ? pCurrentCmd->Usage : 
+             pCurrentCmd->HelpString);
+   }
 
    return Ret;
 }
@@ -170,7 +180,7 @@ int CmdParserInit(const CommandTable_t *CmdTbl,ParserPrintf Function)
    return 0;
 }
 
-int HelpCmd(const char *CmdLine)
+int HelpCmd(char *CmdLine)
 {
    const CommandTable_t *p = gCmdTbl;
    int Ret = RESULT_OK; // assume the best
@@ -184,8 +194,8 @@ int HelpCmd(const char *CmdLine)
 
       PRINT_F("Commands:\n");
       while(p->CmdString != NULL) {
-         if(p->HelpString != NULL && !(p->Flags & CMD_FLAG_HIDE) ) {
-            PRINT_F("  %-10s - %s\n",p->CmdString,p->HelpString);
+         if(p->HelpString != NULL) {
+            PRINT_F("  %s - %s\n",p->CmdString,p->HelpString);
          }
          p++;
       }
@@ -194,3 +204,44 @@ int HelpCmd(const char *CmdLine)
    return Ret;
 }
 
+int ConvertValue(char **Arg,uint32_t *Value)
+{
+   char *cp = *Arg;
+   char *cp1;
+   int Ret = 0;   // assume the best
+   bool bIsHex = false;
+
+   do {
+      cp = SkipSpaces(cp);
+      if(!*cp) {
+      // No value
+         Ret = 1;
+         break;
+      }
+      if(cp[0] == '0' && cp[1] == 'x') {
+      // Hex arg
+         bIsHex = true;
+         cp += 2;
+      }
+      cp1 = cp;
+      while(*cp1) {
+         if(isspace(*cp1)) {
+            cp1++;
+            break;
+         }
+         if((bIsHex && !isxdigit(*cp1)) || (!bIsHex && !isdigit(*cp1))) {
+            Ret = 1;
+            break;
+         }
+         cp1++;
+      }
+      if(Ret == 1) {
+         break;
+      }
+      *Value = (uint32_t) (bIsHex ? atoi_hex(cp) : atoi(cp));
+      *Arg = cp1;
+   } while(false);
+
+// LOG("Returning %d, Value 0x%x Arg '%s'\n",Ret,*Value,cp1);
+   return Ret;
+}

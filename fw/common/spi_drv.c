@@ -24,22 +24,14 @@
 #include "spi_drv.h"
 
 #define DEBUG_LOGGING
-#define VERBOSE_DEBUG_LOGGING
+// #define VERBOSE_DEBUG_LOGGING
 #include "log.h"
-
-typedef struct {
-   uint32_t FlashSize;
-   uint32_t PageSize;
-   uint32_t SectorSize;
-   uint8_t  DevId[3];
-   const char *Desc;
-} FlashInfo_t;
 
 const FlashInfo_t gChipInfo[] = {
 // PANO_G2 Rev C, 8 Megabytes
-   {8*1024*1024,256,64*1024,{0x20,0x20,0x17},"M25P64"},
+   {8*1024*1024,256,64*1024,64*1024,{0x20,0x20,0x17},"M25P64"},
 // PANO_G2 Rev B, 16 Megabytes
-   {16*1024*1024,256,256*1024,{0x20,0x20,0x18},"M25P128"},
+   {16*1024*1024,256,256*1024,256*1024,{0x20,0x20,0x18},"M25P128"},
    {0}   // end of table
 };
 
@@ -47,11 +39,11 @@ static const FlashInfo_t *gChip;
 
 #define CMD_WRITE_STATUS   0x01
 #define CMD_PAGE_PRG       0x02
-#define CMD_READ_DATA      0x03
+#define CMD_READ_DATA      0x03     // Max clock 20 Mhz
 #define CMD_WRITE_DISABLE  0x04
 #define CMD_READ_STATUS    0x05
 #define CMD_WRITE_ENABLE   0x06
-#define CMD_READ_DATA_FAST 0x0b
+#define CMD_READ_DATA_FAST 0x0b     // Max clock 50 Mhz
 #define CMD_SECTOR_ERASE   0xd8
 #define CMD_BULK_ERASE     0xc7
 #define CMD_READ_ID        0x9f
@@ -126,7 +118,6 @@ int32_t spi_read(uint32_t Adr,uint8_t *Buf,uint32_t size)
    spi_sendrecv((uint8_t) ((Adr >> 16) & 0xff));
    spi_sendrecv((uint8_t) ((Adr >> 8) & 0xff));
    spi_sendrecv((uint8_t) (Adr & 0xff));
-   spi_readblock(Buf,1);
    spi_readblock(Buf,size);
    spi_cs(1);
    VLOG_HEX(Buf,size);
@@ -184,8 +175,8 @@ int spi_erase(uint32_t Adr, uint32_t Len)
          ELOG("Unknown chip\n");
          break;
       }
-      if((Adr % p->SectorSize) != 0) {
-         ELOG("Invalid address 0x%x, not start of sector\n",Adr);
+      if((Adr % p->EraseSize) != 0) {
+         ELOG("Invalid address 0x%x, not start of erase boundary\n",Adr);
          break;
       }
 
@@ -194,8 +185,7 @@ int spi_erase(uint32_t Adr, uint32_t Len)
          break;
       }
       spi_write_enable(true);
-      for(i = 0; i < (Len / p->SectorSize); i++) {
-         VLOG("Erasing sector %d @ 0x%x\n",i + 1,Adr);
+      for(i = 0; i < (Len / p->EraseSize); i++) {
          spi_cs(0);
          spi_sendrecv(CMD_SECTOR_ERASE);
          spi_sendrecv((uint8_t) ((Adr >> 16) & 0xff));
@@ -210,3 +200,7 @@ int spi_erase(uint32_t Adr, uint32_t Len)
    return Ret;
 }
 
+FlashInfo_t *spi_get_flashinfo()
+{
+   return gChip;
+}
