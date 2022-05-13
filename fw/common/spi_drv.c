@@ -110,17 +110,30 @@ int spi_chip_init()
    return Ret;
 }
 
-int32_t spi_read(uint32_t Adr,uint8_t *Buf,uint32_t size)
+int32_t spi_read(uint32_t Adr,uint8_t *Buf,uint32_t Len)
 {
+   int BytesRead = 0;
+   int Bytes2Read;
+   const FlashInfo_t *p = gChip;
    VLOG("Called, adr 0x%x size %ld, buf %p\n",Adr,size,Buf);
-   spi_cs(0);
-   spi_sendrecv(CMD_READ_DATA);
-   spi_sendrecv((uint8_t) ((Adr >> 16) & 0xff));
-   spi_sendrecv((uint8_t) ((Adr >> 8) & 0xff));
-   spi_sendrecv((uint8_t) (Adr & 0xff));
-   spi_readblock(Buf,size);
-   spi_cs(1);
-   VLOG_HEX(Buf,size);
+
+   while(BytesRead < Len) {
+      Bytes2Read = Len - BytesRead;
+      if(Bytes2Read > p->PageSize) {
+         Bytes2Read = p->PageSize;
+      }
+      spi_cs(0);
+      spi_sendrecv(CMD_READ_DATA);
+      spi_sendrecv((uint8_t) ((Adr >> 16) & 0xff));
+      spi_sendrecv((uint8_t) ((Adr >> 8) & 0xff));
+      spi_sendrecv((uint8_t) (Adr & 0xff));
+      spi_readblock(Buf,Bytes2Read);
+      spi_cs(1);
+      VLOG_HEX(Buf,Bytes2Read);
+      BytesRead += Bytes2Read;
+      Buf += Bytes2Read;
+      Adr += Bytes2Read;
+   }
    return 0;
 }
 
@@ -157,6 +170,7 @@ int spi_write(uint32_t Adr,uint8_t *pData,uint32_t Len)
          while(spi_read_status() & STATUS_WIP);
          Adr += Bytes2Write;
          Wrote += Bytes2Write;
+         pData += Bytes2Write;
       }
    } while(false);
 
@@ -200,7 +214,7 @@ int spi_erase(uint32_t Adr, uint32_t Len)
    return Ret;
 }
 
-FlashInfo_t *spi_get_flashinfo()
+const FlashInfo_t *spi_get_flashinfo()
 {
    return gChip;
 }

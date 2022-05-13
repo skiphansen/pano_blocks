@@ -35,6 +35,6 @@ int32_t spi_read(uint32_t Adr,uint8_t *Buf,uint32_t size);
 int spi_write(uint32_t Adr,uint8_t *pData,uint32_t Len);
 int spi_erase(uint32_t Adr, uint32_t Len);
 int spi_chip_init(void);
-FlashInfo_t *spi_get_flashinfo(void);
+const FlashInfo_t *spi_get_flashinfo(void);
 #endif // _SPI_DRV_H_
 
