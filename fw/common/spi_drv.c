@@ -23,7 +23,7 @@
 #include "spi_lite.h"
 #include "spi_drv.h"
 
-#define DEBUG_LOGGING
+// #define DEBUG_LOGGING
 // #define VERBOSE_DEBUG_LOGGING
 #include "log.h"
 
@@ -115,7 +115,7 @@ int32_t spi_read(uint32_t Adr,uint8_t *Buf,uint32_t Len)
    int BytesRead = 0;
    int Bytes2Read;
    const FlashInfo_t *p = gChip;
-   VLOG("Called, adr 0x%x size %ld, buf %p\n",Adr,size,Buf);
+   VLOG("Called, adr 0x%x size %ld, buf %p\n",Adr,Len,Buf);
 
    while(BytesRead < Len) {
       Bytes2Read = Len - BytesRead;
@@ -145,6 +145,7 @@ int spi_write(uint32_t Adr,uint8_t *pData,uint32_t Len)
    const FlashInfo_t *p = gChip;
 
    do {
+      VLOG("Called, adr 0x%x Len %ld, pData %p\n",Adr,Len,pData);
       if(p == NULL) {
          ELOG("Unknown chip\n");
          break;
@@ -153,13 +154,15 @@ int spi_write(uint32_t Adr,uint8_t *pData,uint32_t Len)
          ELOG("Invalid length 0x%x\n",Len);
          break;
       }
-      spi_write_enable(true);
       while(Wrote < Len) {
          Bytes2Write = Len;
          BytesLeftInPage = p->PageSize - (Adr % p->PageSize);
          if(Bytes2Write > BytesLeftInPage) {
             Bytes2Write = BytesLeftInPage;
          }
+         VLOG("write %d bytes @ 0x%lx from %p BytesLeftInPage %d\n",
+              Bytes2Write,Adr,pData,Bytes2Write);
+         spi_write_enable(true);
          spi_cs(0);
          spi_sendrecv(CMD_PAGE_PRG);
          spi_sendrecv((uint8_t) ((Adr >> 16) & 0xff));
