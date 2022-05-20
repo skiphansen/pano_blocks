@@ -2,10 +2,11 @@
 ## Params
 ###############################################################################
 XILINX_ISE ?= /opt/Xilinx/14.7/ISE_DS/ISE/bin/lin64
-EXTRA_VFLAGS ?= 
-PROJECT_DIR  ?= build
-PROJECT      ?= fpga
-TOP_MODULE   ?= top
+EXTRA_VFLAGS     ?= 
+PROJECT_DIR      ?= build
+PROJECT          ?= fpga
+TOP_MODULE       ?= top
+PROG_FPGA_OFFSET ?= 0
 
 ###############################################################################
 # Checks
@@ -185,7 +186,7 @@ update_ram:
 ###############################################################################
 BSCAN_SPI_BITFILE = $(BSCAN_SPI_DIR)/$(PART_NAME).bit
 prog_fpga:
-	$(XC3SPROG) $(XC3SPROG_OPTS) -I$(BSCAN_SPI_BITFILE) $(PLATFORM_BITFILE)
+	$(XC3SPROG) $(XC3SPROG_OPTS) -I$(BSCAN_SPI_BITFILE) $(PLATFORM_BITFILE):w:$(PROG_FPGA_OFFSET)
 
 ###############################################################################
 # Rule: build .ngc from .xco
@@ -201,6 +202,9 @@ $(PROJECT_DIR)/$(PROJECT).cgp:
 
 $(PROJECT_DIR)/%.ngc: %.xco $(PROJECT_DIR)/$(PROJECT).cgp
 	(cd $(PROJECT_DIR); coregen -p $(PROJECT).cgp -b  $<)
+
+reset:
+	$(XC3SPROG) $(XC3SPROG_OPTS) -R
 
 include $(MAKE_DIR)/tools.mk
 
