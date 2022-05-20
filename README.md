@@ -14,4 +14,4 @@ article and refer to the [Pano Hacker's Wiki](https://github.com/tomverbeure/pan
 - Skip's [OPL3 port](https://github.com/skiphansen/panog2_opl3) for the G2
 - Skip's [NES Emulator](https://github.com/skiphansen/panog2_nes) project.
 - Skip's [USB sniffer](https://github.com/skiphansen/panog2_usb_sniffer)
-
+- Skip's [G2 Flash Loader](https://github.com/skiphansen/panog2_ldr)
