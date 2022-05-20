@@ -1,0 +1,25 @@
+From 522b2387bcd82ea2621eaae9f9686fa597025255 Mon Sep 17 00:00:00 2001
+From: Skip Hansen <skip@gfrn.org>
+Date: Fri, 20 May 2022 10:25:30 -0700
+Subject: [PATCH] Fix initial blknum for tftp_get so it works.
+
+---
+ src/apps/tftp/tftp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/apps/tftp/tftp.c b/src/apps/tftp/tftp.c
+index ddfdbfc0..9ce5a14b 100644
+--- a/src/apps/tftp/tftp.c
++++ b/src/apps/tftp/tftp.c
+@@ -540,7 +540,7 @@ tftp_put(void* handle, const ip_addr_t *addr, u16_t port, const char* fname, enu
+   LWIP_ERROR("tftp_put: invalid mode", mode <= TFTP_MODE_BINARY, return ERR_VAL);
+ 
+   tftp_state.handle = handle;
+-  tftp_state.blknum = 1;
++  tftp_state.blknum = 0;
+   tftp_state.mode_write = 0; /* We want to send data */
+   return send_request(addr, port, TFTP_WRQ, fname, mode_to_string(mode));
+ }
+-- 
+2.25.1
+
