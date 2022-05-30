@@ -14,3 +14,6 @@ clean_tools:
 start_console:
 	$(CONSOLE_PREFIX)
 
+reset:
+	$(XC3SPROG) $(XC3SPROG_OPTS) -R
+

@@ -203,8 +203,5 @@ $(PROJECT_DIR)/$(PROJECT).cgp:
 $(PROJECT_DIR)/%.ngc: %.xco $(PROJECT_DIR)/$(PROJECT).cgp
 	(cd $(PROJECT_DIR); coregen -p $(PROJECT).cgp -b  $<)
 
-reset:
-	$(XC3SPROG) $(XC3SPROG_OPTS) -R
-
 include $(MAKE_DIR)/tools.mk
 
