@@ -15,7 +15,7 @@ PROG_FPGA_OFFSET ?= 0
 ifeq ($(PLATFORM),pano-g2-c)
     PART_NAME    = xc6slx100
     PART_PACKAGE = fgg484
-    PART_SPEED   = 2
+    PART_SPEED   = 3
     PANO_SERIES  = g2
 else ifeq ($(PLATFORM),pano-g2)
     PART_NAME    = xc6slx150
