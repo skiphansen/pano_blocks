@@ -7,7 +7,14 @@ PROJECT_DIR      ?= build
 PROJECT          ?= fpga
 TOP_MODULE       ?= top
 PROG_FPGA_OFFSET ?= 0
-
+XVC              ?= 172.17.0.1:2542
+IMPACT_CABLE     ?= -target \"xilinx_xvc host=$(XVC) disableversioncheck=true\"
+USE_CHIPSCOPE    ?= FALSE
+ifeq ($(USE_CHIPSCOPE),FALSE)
+    PROJECT_NGC      = $(PROJECT_DIR)/$(PROJECT).ngc
+else
+    PROJECT_NGC      = $(PROJECT_DIR)/$(PROJECT)_cs.ngc
+endif
 ###############################################################################
 # Checks
 ###############################################################################
@@ -67,6 +74,13 @@ $(PROJECT_DIR)/$(PROJECT).ut: | $(PROJECT_DIR)
 	cp $(MAKE_DIR)/default.ut $(PROJECT_DIR)/$(PROJECT).ut; fi
 
 ###############################################################################
+# PROJECT.cdc
+###############################################################################
+$(PROJECT_DIR)/$(PROJECT).cdc: | $(PROJECT_DIR)
+	if [ -e $(PROJECT).cdc ]; then cp $(PROJECT).cdc $(PROJECT_DIR); else \
+	cp $(MAKE_DIR)/default.cdc $(PROJECT_DIR)/$(PROJECT).cdc; fi
+
+###############################################################################
 # PROJECT.xst
 ###############################################################################
 $(PROJECT_DIR)/$(PROJECT).xst: | $(PROJECT_DIR)
@@ -79,7 +93,6 @@ $(PROJECT_DIR)/$(PROJECT).xst: | $(PROJECT_DIR)
 ifneq ($(EXTRA_VFLAGS),)
 	echo "-define {$(EXTRA_VFLAGS)}" >> $@
 endif
-
 
 ###############################################################################
 # PROJECT.prj
@@ -113,14 +126,25 @@ $(PROJECT_DIR)/$(PROJECT).ngc: $(NGC_FILES) $(PROJECT_DIR)/$(PROJECT).prj $(SRC_
 	@cd $(PROJECT_DIR); $(TOOL_PATH)/xst -intstyle ise -ifn $(PROJECT).xst -ofn $(PROJECT).syr
 
 ###############################################################################
+# Rule: Insert Chipscope
+###############################################################################
+$(PROJECT_DIR)/$(PROJECT)_cs.ngc: $(PROJECT_DIR)/$(PROJECT).ngc $(UCF_FILE) $(PROJECT_DIR)/$(PROJECT).cdc
+	@echo "####################################################################"
+	@echo "# ISE: Insert Chipscope Core"
+	@echo "####################################################################"
+	@cd $(PROJECT_DIR); $(TOOL_PATH)/inserter -intstyle ise -mode insert -ise_project_dir $(abspath $(PROJECT_DIR)) \
+	-proj $(PROJECT).cdc -intstyle ise -dd _ngo \
+	-uc $(abspath $(UCF_FILE)) -p $(PART_NAME)-$(PART_PACKAGE)-$(PART_SPEED) $(PROJECT).ngc $(PROJECT)_cs.ngc
+
+###############################################################################
 # Rule: Convert netlist
 ###############################################################################
-$(PROJECT_DIR)/$(PROJECT).ngd: $(PROJECT_DIR)/$(PROJECT).ngc $(UCF_FILE)
+$(PROJECT_DIR)/$(PROJECT).ngd: $(PROJECT_NGC) $(UCF_FILE)
 	@echo "####################################################################"
 	@echo "# ISE: Convert netlist"
 	@echo "####################################################################"
 	@cd $(PROJECT_DIR); $(TOOL_PATH)/ngdbuild -intstyle ise -dd _ngo -nt timestamp \
-	-uc $(abspath $(UCF_FILE)) -p $(PART_NAME)-$(PART_PACKAGE)-$(PART_SPEED) $(PROJECT).ngc $(PROJECT).ngd -bm ../firmware.bmm
+	-uc $(abspath $(UCF_FILE)) -p $(PART_NAME)-$(PART_PACKAGE)-$(PART_SPEED) $(PROJECT)_cs.ngc $(PROJECT).ngd -bm ../firmware.bmm
 
 ###############################################################################
 # Rule: Map
@@ -171,6 +195,19 @@ $(PROJECT_DIR)/$(PROJECT).bin: $(BIT_FILE)
 ###############################################################################
 load:
 	$(XC3SPROG) $(XC3SPROG_OPTS) $(PLATFORM_BITFILE)
+
+###############################################################################
+# Rule: Load Bitstream using Impact
+###############################################################################
+load_impact:
+	$(eval TMP_LOAD_IMPACT := $(shell mktemp -p $(PROJECT_DIR)))
+	echo "setMode -bscan" > $(TMP_LOAD_IMPACT)
+	echo "setCable $(IMPACT_CABLE)" >> $(TMP_LOAD_IMPACT)
+	echo "addDevice -p 1 -file \"$(PLATFORM_BITFILE)\"" >> $(TMP_LOAD_IMPACT)
+	echo "program -p 1" >> $(TMP_LOAD_IMPACT)
+	echo "exit" >> $(TMP_LOAD_IMPACT)
+	$(TOOL_PATH)/impact -batch $(TMP_LOAD_IMPACT)
+	rm $(TMP_LOAD_IMPACT)
 
 ###############################################################################
 # Rule: Upate Bitstream with new firmware image
