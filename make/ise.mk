@@ -11,9 +11,9 @@ XVC              ?= 172.17.0.1:2542
 IMPACT_CABLE     ?= -target \"xilinx_xvc host=$(XVC) disableversioncheck=true\"
 USE_CHIPSCOPE    ?= FALSE
 ifeq ($(USE_CHIPSCOPE),FALSE)
-    PROJECT_NGC      = $(PROJECT_DIR)/$(PROJECT).ngc
+    PROJECT_NGC      = $(PROJECT).ngc
 else
-    PROJECT_NGC      = $(PROJECT_DIR)/$(PROJECT)_cs.ngc
+    PROJECT_NGC      = $(PROJECT)_cs.ngc
 endif
 ###############################################################################
 # Checks
@@ -139,12 +139,12 @@ $(PROJECT_DIR)/$(PROJECT)_cs.ngc: $(PROJECT_DIR)/$(PROJECT).ngc $(UCF_FILE) $(PR
 ###############################################################################
 # Rule: Convert netlist
 ###############################################################################
-$(PROJECT_DIR)/$(PROJECT).ngd: $(PROJECT_NGC) $(UCF_FILE)
+$(PROJECT_DIR)/$(PROJECT).ngd: $(PROJECT_DIR)/$(PROJECT_NGC) $(UCF_FILE)
 	@echo "####################################################################"
 	@echo "# ISE: Convert netlist"
 	@echo "####################################################################"
 	@cd $(PROJECT_DIR); $(TOOL_PATH)/ngdbuild -intstyle ise -dd _ngo -nt timestamp \
-	-uc $(abspath $(UCF_FILE)) -p $(PART_NAME)-$(PART_PACKAGE)-$(PART_SPEED) $(PROJECT)_cs.ngc $(PROJECT).ngd -bm ../firmware.bmm
+	-uc $(abspath $(UCF_FILE)) -p $(PART_NAME)-$(PART_PACKAGE)-$(PART_SPEED) $(PROJECT_NGC) $(PROJECT).ngd -bm ../firmware.bmm
 
 ###############################################################################
 # Rule: Map
