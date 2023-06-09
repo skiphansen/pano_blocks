@@ -2,6 +2,9 @@
 #include "exception.h"
 #include "assert.h"
 #include "csr.h"
+#ifdef ALTERNATE_PRINTF
+#include "printf.h"
+#endif
 
 //-----------------------------------------------------------------
 // Defines:

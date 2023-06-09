@@ -21,6 +21,11 @@
 #ifndef _LOG_H_
 #define _LOG_H_
 
+#ifdef ALTERNATE_PRINTF
+#include "printf.h"
+#endif
+
+
 // By default logging is sent to the screen only.  It can also be sent to the
 // serial port by defining LOG_TO_BOTH or it can be sent
 // to the serial port ONLY by defining LOG_TO_SERIAL

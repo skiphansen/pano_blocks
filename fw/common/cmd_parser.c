@@ -184,7 +184,6 @@ int HelpCmd(char *CmdLine)
 {
    const CommandTable_t *p = gCmdTbl;
    int Ret = RESULT_OK; // assume the best
-   LOG("Called\n");
 
    do {
       if(p == NULL || gPrintf == NULL) {

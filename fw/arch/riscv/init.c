@@ -31,7 +31,9 @@ void init(void)
 #endif
 
     // Register serial driver with printf
+#ifndef ALTERNATE_PRINTF
     printf_register(uartlite_putc);
+#endif
 
 #ifdef CONFIG_SPILITE_BASE
     spi_init(CONFIG_SPILITE_BASE);
