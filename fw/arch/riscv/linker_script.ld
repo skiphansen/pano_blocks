@@ -6,20 +6,20 @@ MEMORY
 }
 
 SECTIONS
-{	
-	/* first section is .text which is used for code */
-	.text :
-	{
-		*(.text .text.*)           /* remaining code */
-		*(.rodata)                 /* read-only data (constants) */
-		*(.rodata*)
-		*(.rdata*)
-		. = ALIGN(4);
-	} > sram
+{       
+        /* first section is .text which is used for code */
+        .text :
+        {
+                *(.text .text.*)           /* remaining code */
+                *(.rodata)                 /* read-only data (constants) */
+                *(.rodata*)
+                *(.rdata*)
+                . = ALIGN(4);
+        } > sram
 
-	/* .data section which is used for initialized data */
-	.data : 
-	{
+        /* .data section which is used for initialized data */
+        .data : 
+        {
     *(.got.plt) *(.got)
     *(.shdata)
     *(.data .data.* .gnu.linkonce.d.*)
@@ -31,11 +31,11 @@ SECTIONS
     *(.ram)
     . = ALIGN (8);
     _edata = .;
-	} > sram	
+        } > sram        
      
   .bss : 
   {
-	. = ALIGN(4);
+        . = ALIGN(4);
     _bss_start = . ;
     
     *(.bss*)
@@ -43,7 +43,7 @@ SECTIONS
     *(COMMON)
     /* Allocate room for stack */
     .   =  ALIGN(8) ;
-    .   += 4096 ;
+    .   += STACK_SIZE ;
     _sp =  . - 16;
   } > sram
 
