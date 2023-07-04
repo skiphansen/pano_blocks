@@ -56,31 +56,32 @@ static const FlashInfo_t *gChip;
 #define STATUS_BP2         0x10
 #define STATUS_SRWD        0x80
 
+
 uint8_t spi_read_status()
 {
    uint8_t Ret;
 
-   spi_cs(0);
+   spi_cs(SPI_CS_FLASH);
    spi_sendrecv(CMD_READ_STATUS);
    spi_readblock(&Ret,1);
-   spi_cs(1);
+   spi_cs(SPI_CS_INACTIVE);
 
    return Ret;
 }
 
 int spi_write_enable(bool bEnable)
 {
-   spi_cs(0);
+   spi_cs(SPI_CS_FLASH);
    spi_sendrecv(bEnable ? CMD_WRITE_ENABLE : CMD_WRITE_DISABLE);
-   spi_cs(1);
+   spi_cs(SPI_CS_INACTIVE);
 }
 
 int spi_read_device_id(uint8_t *pBuf)
 {
-   spi_cs(0);
+   spi_cs(SPI_CS_FLASH);
    spi_sendrecv(CMD_READ_ID);
    spi_readblock(pBuf,3);
-   spi_cs(1);
+   spi_cs(SPI_CS_INACTIVE);
 
    return 0;
 }
@@ -122,13 +123,13 @@ int32_t spi_read(uint32_t Adr,uint8_t *Buf,uint32_t Len)
       if(Bytes2Read > p->PageSize) {
          Bytes2Read = p->PageSize;
       }
-      spi_cs(0);
+      spi_cs(SPI_CS_FLASH);
       spi_sendrecv(CMD_READ_DATA);
       spi_sendrecv((uint8_t) ((Adr >> 16) & 0xff));
       spi_sendrecv((uint8_t) ((Adr >> 8) & 0xff));
       spi_sendrecv((uint8_t) (Adr & 0xff));
       spi_readblock(Buf,Bytes2Read);
-      spi_cs(1);
+      spi_cs(SPI_CS_INACTIVE);
       VLOG_HEX(Buf,Bytes2Read);
       BytesRead += Bytes2Read;
       Buf += Bytes2Read;
@@ -163,13 +164,13 @@ int spi_write(uint32_t Adr,uint8_t *pData,uint32_t Len)
          VLOG("write %d bytes @ 0x%lx from %p BytesLeftInPage %d\n",
               Bytes2Write,Adr,pData,Bytes2Write);
          spi_write_enable(true);
-         spi_cs(0);
+         spi_cs(SPI_CS_FLASH);
          spi_sendrecv(CMD_PAGE_PRG);
          spi_sendrecv((uint8_t) ((Adr >> 16) & 0xff));
          spi_sendrecv((uint8_t) ((Adr >> 8) & 0xff));
          spi_sendrecv((uint8_t) (Adr & 0xff));
          spi_writeblock(pData,Bytes2Write);
-         spi_cs(1);
+         spi_cs(SPI_CS_INACTIVE);
          while(spi_read_status() & STATUS_WIP);
          Adr += Bytes2Write;
          Wrote += Bytes2Write;
@@ -203,12 +204,12 @@ int spi_erase(uint32_t Adr, uint32_t Len)
       }
       spi_write_enable(true);
       for(i = 0; i < (Len / p->EraseSize); i++) {
-         spi_cs(0);
+         spi_cs(SPI_CS_FLASH);
          spi_sendrecv(CMD_SECTOR_ERASE);
          spi_sendrecv((uint8_t) ((Adr >> 16) & 0xff));
          spi_sendrecv((uint8_t) ((Adr >> 8) & 0xff));
          spi_sendrecv((uint8_t) (Adr & 0xff));
-         spi_cs(1);
+         spi_cs(SPI_CS_INACTIVE);
          while(spi_read_status() & STATUS_WIP);
          Adr += p->SectorSize;
       }

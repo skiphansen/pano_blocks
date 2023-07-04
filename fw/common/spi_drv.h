@@ -18,6 +18,10 @@
 #ifndef _SPI_DRV_H_
 #define _SPI_DRV_H_
 
+#define SPI_CS_INACTIVE    0xffffffff
+#define SPI_CS_FLASH       (SPI_CS_INACTIVE & ~1)
+#define SPI_CS_SDCARD      (SPI_CS_INACTIVE & ~2)
+
 typedef struct {
    uint32_t FlashSize;
    uint32_t PageSize;
