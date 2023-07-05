@@ -29,7 +29,9 @@ ARCH_LFLAGS += -nostartfiles -nodefaultlibs -lm
 ARCH_CFLAGS += -DCONFIG_USE_LOCAL_STRING_H
 ARCH_LFLAGS += -Wl,--defsym=BASE_ADDRESS=$(BASE_ADDRESS)
 ARCH_LFLAGS += -Wl,--defsym=MEM_SIZE=$(MEM_SIZE)
+ifneq ($(STACK_SIZE),)
 ARCH_LFLAGS += -Wl,--defsym=STACK_SIZE=$(STACK_SIZE)
+endif
 
 ###############################################################################
 # Link type (RAM or ROM)

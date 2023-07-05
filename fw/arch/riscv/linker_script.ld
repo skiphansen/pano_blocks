@@ -43,7 +43,7 @@ SECTIONS
     *(COMMON)
     /* Allocate room for stack */
     .   =  ALIGN(8) ;
-    .   += STACK_SIZE ;
+    .   += DEFINED(STACK_SIZE) ?  STACK_SIZE : 4096;
     _sp =  . - 16;
   } > sram
 
